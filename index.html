@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .info-container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 600px;
+      margin: 20px auto;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    .info-item {
+      margin-bottom: 15px;
+    }
+    .info-item strong {
+      color: #555;
+    }
+    .loading {
+      text-align: center;
+      font-size: 18px;
+      margin-top: 50px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <h1>User Accessible Details</h1>
+  <div class="info-container" id="user-details">
+    <div class="loading">Fetching user details...</div>
+  </div>
+
+  <script>
+    // Function to fetch user's location
+    function getLocation() {
+      return new Promise((resolve, reject) => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((position) => {
+            resolve({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            });
+          }, reject);
+        } else {
+          resolve({ error: 'Geolocation not supported' });
+        }
+      });
+    }
+
+    // Function to fetch browser info
+    function getBrowserInfo() {
+      return {
+        appName: navigator.appName,
+        appVersion: navigator.appVersion,
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+        language: navigator.language,
+        cookiesEnabled: navigator.cookieEnabled,
+      };
+    }
+
+    // Function to fetch screen information
+    function getScreenInfo() {
+      return {
+        width: window.screen.width,
+        height: window.screen.height,
+        colorDepth: window.screen.colorDepth,
+        pixelDepth: window.screen.pixelDepth,
+      };
+    }
+
+    // Function to display user details
+    async function displayUserDetails() {
+      const detailsContainer = document.getElementById('user-details');
+      detailsContainer.innerHTML = ''; // Clear the loading text
+
+      // Fetch location, browser, and screen info
+      const [location, browserInfo, screenInfo] = await Promise.all([
+        getLocation(),
+        getBrowserInfo(),
+        getScreenInfo()
+      ]);
+
+      // Create HTML structure to display the information
+      const detailsHTML = `
+        <div class="info-item"><strong>Browser Name:</strong> ${browserInfo.appName}</div>
+        <div class="info-item"><strong>Browser Version:</strong> ${browserInfo.appVersion}</div>
+        <div class="info-item"><strong>User Agent:</strong> ${browserInfo.userAgent}</div>
+        <div class="info-item"><strong>Platform:</strong> ${browserInfo.platform}</div>
+        <div class="info-item"><strong>Language:</strong> ${browserInfo.language}</div>
+        <div class="info-item"><strong>Cookies Enabled:</strong> ${browserInfo.cookiesEnabled}</div>
+
+        <div class="info-item"><strong>Screen Width:</strong> ${screenInfo.width}px</div>
+        <div class="info-item"><strong>Screen Height:</strong> ${screenInfo.height}px</div>
+        <div class="info-item"><strong>Color Depth:</strong> ${screenInfo.colorDepth} bits</div>
+        <div class="info-item"><strong>Pixel Depth:</strong> ${screenInfo.pixelDepth} bits</div>
+
+        ${location.error ? `<div class="info-item"><strong>Location:</strong> ${location.error}</div>` : `
+        <div class="info-item"><strong>Latitude:</strong> ${location.latitude}</div>
+        <div class="info-item"><strong>Longitude:</strong> ${location.longitude}</div>`}
+      `;
+
+      // Insert the information into the container
+      detailsContainer.innerHTML = detailsHTML;
+    }
+
+    // Call the function to display user details on page load
+    window.onload = displayUserDetails;
+  </script>
+</body>
+</html>
